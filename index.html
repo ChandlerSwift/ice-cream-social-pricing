@@ -36,6 +36,9 @@
         #reset-button {
             margin: auto;
         }
+        p#total {
+            font-size: 1.5em;
+        }
     </style>
 </head>
 <script src="https://unpkg.com/vue@3"></script>
@@ -52,7 +55,7 @@
         <ul>
             <li v-for="item in purchased_items">{{ item.name }}: {{ priceFormatter.format(item.price) }}</li>
         </ul>
-        <p>Total: {{ priceFormatter.format(purchased_items.reduce((a, b) => a+b.price, 0)) }}</p>
+        <p id="total">Total: {{ priceFormatter.format(purchased_items.reduce((a, b) => a+b.price, 0)) }}</p>
         <button id="reset-button" @click="purchased_items=[]">Reset</button>
     </div>
 </div>
