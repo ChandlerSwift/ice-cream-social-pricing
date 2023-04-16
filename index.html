@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ice Cream Social Pricing Calculator</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: sans-serif;
+        }
+        #app {
+            display: grid;
+            grid-template-columns: 1fr 10em;
+            height: 100vh;
+        }
+        #app div.buttons {
+            display: grid;
+            grid-template-columns: 50% 50%;
+            height: 100vh;
+            justify-content: center;
+        }
+        #app div.buttons button.item, #reset-button {
+            border: 1px solid black;
+            margin: 0.5rem;
+            font-size: 2em;
+        }
+        #app div.summary {
+            overflow: auto;
+        }
+        #app div.summary ul {
+            padding-left: 20px;
+        }
+        #reset-button {
+            margin: auto;
+        }
+    </style>
+</head>
+<script src="https://unpkg.com/vue@3"></script>
+
+<div id="app">
+    <div class="buttons">
+      <template v-for="(items, category) in available_items">
+            <!-- <h4>{{ category }}</h4> -->
+            <button class="item" v-for="(price, item) in items" @click="purchased_items.push({name: item, price: price})">{{ item }}: {{ priceFormatter.format(price) }}</button>
+        </template>
+    </div>
+    <div class="summary">
+        <h3>Totals</h3>
+        <ul>
+            <li v-for="item in purchased_items">{{ item.name }}: {{ priceFormatter.format(item.price) }}</li>
+        </ul>
+        <p>Total: {{ priceFormatter.format(purchased_items.reduce((a, b) => a+b.price, 0)) }}</p>
+        <button id="reset-button" @click="purchased_items=[]">Reset</button>
+    </div>
+</div>
+
+<script>
+    const { createApp } = Vue;
+
+    const app = createApp({
+        data() {
+            return {
+                plates: [],
+                purchased_items: [],
+                available_items: {
+                    "Sandwiches": {
+                        "Turkey Salad": 4,
+                        "BBQ": 4,
+                    },
+                    "Sides": {
+                        "Beans": .75,
+                        "Potato Salad": 2,
+                        "Pickles": 0,
+                    },
+                    "Desserts": {
+                        "Cake": 1.5,
+                        "Cake à la mode": 2.25,
+                        "Pie": 2,
+                        "Pie à la mode": 2.75,
+                    },
+                    "Drinks": {
+                        "Root Beer Float": 2,
+                        "Root Beer": 1,
+                        "Milk": 1,
+                        "Egg Coffee": .5,
+                        "Bottled Water": 1,
+                    },
+                },
+                priceFormatter: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+            };
+        },
+    }).mount('#app');
+</script>
+
+</html>
