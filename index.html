@@ -10,10 +10,11 @@
         body {
             margin: 0;
             font-family: sans-serif;
+            font-size: 24px;
         }
         #app {
             display: grid;
-            grid-template-columns: 1fr 10em;
+            grid-template-columns: 1fr 15em;
             height: 100vh;
         }
         #app div.buttons {
@@ -22,41 +23,47 @@
             height: 100vh;
             justify-content: center;
         }
-        #app div.buttons button.item, #reset-button {
+        button {
             border: 1px solid black;
             margin: 0.5rem;
             font-size: 2em;
         }
+        #app div.buttons.sub button:disabled {
+            color: lightgray;
+        }
+        #app div.buttons.sub button:not(:disabled) {
+            color: red;
+        }
         #app div.summary {
             overflow: auto;
+            display: flex;
+            flex-direction: column;
         }
         #app div.summary ul {
             padding-left: 20px;
-        }
-        #reset-button {
-            margin: auto;
-        }
-        p#total {
-            font-size: 1.5em;
+            flex-grow: 1;
         }
     </style>
 </head>
 <script src="https://unpkg.com/vue@3"></script>
 
 <div id="app">
-    <div class="buttons">
-      <template v-for="(items, category) in available_items">
-            <!-- <h4>{{ category }}</h4> -->
-            <button class="item" v-for="(price, item) in items" @click="purchased_items.push({name: item, price: price})">{{ item }}: {{ priceFormatter.format(price) }}</button>
-        </template>
+    <div class="buttons" :class="{ add: addMode, sub: !addMode }">
+        <button
+            v-for="item in items"
+            :class="{ purchased: item.quantity != 0 }"
+            :disabled="!addMode && item.quantity == 0"
+            @click="if (addMode) { item.quantity++; } else { item.quantity--; addMode=true; }"
+        >{{ item.name }}: {{ priceFormatter.format(item.cost) }}</button>
     </div>
     <div class="summary">
         <h3>Totals</h3>
         <ul>
-            <li v-for="item in purchased_items">{{ item.name }}: {{ priceFormatter.format(item.price) }}</li>
+            <li v-for="item in items" v-show="item.quantity != 0">{{ item.name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
         </ul>
-        <p id="total">Total: {{ priceFormatter.format(purchased_items.reduce((a, b) => a+b.price, 0)) }}</p>
-        <button id="reset-button" @click="purchased_items=[]">Reset</button>
+        <p id="total">Total: {{ priceFormatter.format(items.reduce((total, item) => total + item.cost * item.quantity, 0)) }}</p>
+        <button @click="items.forEach(item => item.quantity = 0)">Reset</button>
+        <button @click="addMode=!addMode">Minus</button>
     </div>
 </div>
 
@@ -66,35 +73,82 @@
     const app = createApp({
         data() {
             return {
-                plates: [],
-                purchased_items: [],
-                available_items: {
-                    "Sandwiches": {
-                        "Turkey Salad": 4,
-                        "BBQ": 4,
+                addMode: true,
+                items: [
+                    {
+                        name: "Turkey Salad",
+                        cost: 4,
+                        quantity: 0,
                     },
-                    "Sides": {
-                        "Beans": .75,
-                        "Potato Salad": 2,
-                        "Pickles": 0,
+                    {
+                        name: "BBQ",
+                        cost: 4,
+                        quantity: 0,
                     },
-                    "Desserts": {
-                        "Cake": 1.5,
-                        "Cake à la mode": 2.25,
-                        "Pie": 2,
-                        "Pie à la mode": 2.75,
+                    {
+                        name: "Beans",
+                        cost: 0.75,
+                        quantity: 0,
                     },
-                    "Drinks": {
-                        "Root Beer Float": 2,
-                        "Root Beer": 1,
-                        "Milk": 1,
-                        "Egg Coffee": .5,
-                        "Bottled Water": 1,
+                    {
+                        name: "Potato Salad",
+                        cost: 2,
+                        quantity: 0,
                     },
-                },
+                    {
+                        name: "Pickles",
+                        cost: 0,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Cake",
+                        cost: 1.5,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Cake à la mode",
+                        cost: 2.25,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Pie",
+                        cost: 2,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Pie à la mode",
+                        cost: 2.75,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Root Beer Float",
+                        cost: 2,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Root Beer",
+                        cost: 1,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Milk",
+                        cost: 1,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Egg Coffee",
+                        cost: 0.5,
+                        quantity: 0,
+                    },
+                    {
+                        name: "Bottled Water",
+                        cost: 1,
+                        quantity: 0,
+                    },
+                ],
                 priceFormatter: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
             };
-        },
+        }
     }).mount('#app');
 </script>
 
