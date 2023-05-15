@@ -45,6 +45,10 @@
         }
         #total {
             font-size: 2em;
+            margin: 0;
+        }
+        #coupon {
+            color: red;
         }
     </style>
 </head>
@@ -64,9 +68,11 @@
         <ul>
             <li v-for="item in items" v-show="item.quantity != 0">{{ item.name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
         </ul>
-        <p id="total">Total: {{ priceFormatter.format(items.reduce((total, item) => total + item.cost * item.quantity, 0)) }}</p>
+        <p v-if="coupon" id="coupon">&ndash;{{ priceFormatter.format(discount()) }}</p>
+        <p id="total">Total: {{ priceFormatter.format(total() - discount()) }}</p>
         <button @click="items.forEach(item => item.quantity = 0)">Reset</button>
         <button @click="addMode=!addMode">Minus</button>
+        <button @click="coupon = !coupon">{{ coupon ? "No coupon" : "Coupon" }}</button>
     </div>
 </div>
 
@@ -77,6 +83,7 @@
         data() {
             return {
                 addMode: true,
+                coupon: false,
                 items: [
                     {
                         name: "Turkey Salad",
@@ -151,6 +158,18 @@
                 ],
                 priceFormatter: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
             };
+        },
+        methods: {
+            discount() {
+                if (this.coupon) {
+                    return Math.min(this.total()/2, 6);
+                } else {
+                    return 0;
+                }
+            },
+            total() {
+                return this.items.reduce((total, item) => total + item.cost * item.quantity, 0);
+            }
         }
     }).mount('#app');
 </script>
