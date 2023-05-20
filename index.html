@@ -69,7 +69,7 @@
         </ul>
         <p v-if="postcards > 0" id="postcard">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
         <p id="total">Total: {{ priceFormatter.format(total() - discount()) }}</p>
-        <button @click="items.forEach(item => item.quantity = 0)">Reset</button>
+        <button @click="items.forEach(item => item.quantity = 0); postcards = 0">Reset</button>
         <button @click="addMode=!addMode">Minus</button>
         <button :disabled="!addMode && postcards == 0"
             @click="if (addMode) { postcards++; } else { postcards--; addMode=true; }">$7 off</button>
