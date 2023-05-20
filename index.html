@@ -48,7 +48,7 @@
             font-size: 2em;
             margin: 0;
         }
-        #coupon {
+        #postcard {
             color: red;
         }
     </style>
@@ -59,21 +59,20 @@
     <div class="buttons" :class="{ add: addMode, sub: !addMode }">
         <button
             v-for="item in items"
-            :class="{ purchased: item.quantity != 0 }"
             :disabled="!addMode && item.quantity == 0"
             @click="if (addMode) { item.quantity++; } else { item.quantity--; addMode=true; }"
         >{{ item.name }}: {{ priceFormatter.format(item.cost) }}</button>
     </div>
     <div class="summary">
-        <h3>Totals</h3>
         <ul>
             <li v-for="item in items" v-show="item.quantity != 0">{{ item.name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
         </ul>
-        <p v-if="coupon" id="coupon">&ndash;{{ priceFormatter.format(discount()) }}</p>
+        <p v-if="postcards > 0" id="postcard">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
         <p id="total">Total: {{ priceFormatter.format(total() - discount()) }}</p>
         <button @click="items.forEach(item => item.quantity = 0)">Reset</button>
         <button @click="addMode=!addMode">Minus</button>
-        <button @click="coupon = !coupon">{{ coupon ? "No coupon" : "Coupon" }}</button>
+        <button :disabled="!addMode && postcards == 0"
+            @click="if (addMode) { postcards++; } else { postcards--; addMode=true; }">$7 off</button>
     </div>
 </div>
 
@@ -84,7 +83,7 @@
         data() {
             return {
                 addMode: true,
-                coupon: false,
+                postcards: 0,
                 items: [
                     {
                         name: "Turkey Salad",
@@ -162,11 +161,7 @@
         },
         methods: {
             discount() {
-                if (this.coupon) {
-                    return Math.min(this.total()/2, 6);
-                } else {
-                    return 0;
-                }
+                return Math.min(this.total(), 7 * this.postcards);
             },
             total() {
                 return this.items.reduce((total, item) => total + item.cost * item.quantity, 0);
