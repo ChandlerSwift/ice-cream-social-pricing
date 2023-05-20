@@ -29,10 +29,10 @@
             margin: 0.5rem;
             font-size: 2em;
         }
-        #app div.buttons.sub button:disabled {
+        #app div.buttons.sub button:disabled, #add-postcard.sub:disabled {
             color: lightgray;
         }
-        #app div.buttons.sub button:not(:disabled) {
+        #app div.buttons.sub button:not(:disabled), #add-postcard.sub:not(:disabled) {
             color: red;
         }
         #app div.summary {
@@ -71,7 +71,8 @@
         <p id="total">Total: {{ priceFormatter.format(total() - discount()) }}</p>
         <button @click="items.forEach(item => item.quantity = 0); postcards = 0">Reset</button>
         <button @click="addMode=!addMode">Minus</button>
-        <button :disabled="!addMode && postcards == 0"
+        <button id="add-postcard" :disabled="!addMode && postcards == 0"
+            :class="{ add: addMode, sub: !addMode }"
             @click="if (addMode) { postcards++; } else { postcards--; addMode=true; }">$7 off</button>
     </div>
 </div>
