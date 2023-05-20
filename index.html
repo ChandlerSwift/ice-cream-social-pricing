@@ -29,10 +29,10 @@
             margin: 0.5rem;
             font-size: 2em;
         }
-        #app div.buttons.sub button:disabled, #add-postcard.sub:disabled {
+        #app div.buttons.sub button:disabled, div.summary.sub button.removable:disabled {
             color: lightgray;
         }
-        #app div.buttons.sub button:not(:disabled), #add-postcard.sub:not(:disabled) {
+        #app div.buttons.sub button:not(:disabled), div.summary.sub button.removable:not(:disabled) {
             color: red;
         }
         #app div.summary {
@@ -48,8 +48,12 @@
             font-size: 2em;
             margin: 0;
         }
-        #postcard {
+        p.discount {
             color: red;
+            margin: 0;
+        }
+        div.summary button {
+            padding: 0.3em;
         }
     </style>
 </head>
@@ -63,17 +67,19 @@
             @click="if (addMode) { item.quantity++; } else { item.quantity--; addMode=true; }"
         >{{ item.name }}: {{ priceFormatter.format(item.cost) }}</button>
     </div>
-    <div class="summary">
+    <div class="summary" :class="{ add: addMode, sub: !addMode }">
         <ul>
             <li v-for="item in items" v-show="item.quantity != 0">{{ item.name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
         </ul>
-        <p v-if="postcards > 0" id="postcard">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
-        <p id="total">Total: {{ priceFormatter.format(total() - discount()) }}</p>
-        <button @click="items.forEach(item => item.quantity = 0); postcards = 0">Reset</button>
-        <button @click="addMode=!addMode">Minus</button>
-        <button id="add-postcard" :disabled="!addMode && postcards == 0"
-            :class="{ add: addMode, sub: !addMode }"
+        <p v-if="postcards > 0" class="discount">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
+        <p v-if="freeMeal" class="discount">&ndash;{{ priceFormatter.format(total()) }} (free meal)</p>
+        <p id="total">Total: {{ priceFormatter.format(freeMeal ? 0 : total() - discount()) }}</p>
+        <button class="removable" :disabled="!addMode && postcards == 0"
             @click="if (addMode) { postcards++; } else { postcards--; addMode=true; }">$7 off</button>
+        <button class="removable" :disabled="addMode == freeMeal"
+            @click="freeMeal = !freeMeal; addMode = true">Free Meal</button>
+        <button @click="addMode=!addMode">Minus</button>
+        <button @click="items.forEach(item => item.quantity = 0); postcards = 0; freeMeal = false">Check out</button>
     </div>
 </div>
 
@@ -85,6 +91,7 @@
             return {
                 addMode: true,
                 postcards: 0,
+                freeMeal: false,
                 items: [
                     {
                         name: "Turkey Salad",
