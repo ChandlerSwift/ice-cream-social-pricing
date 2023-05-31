@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stats</title>
+    <script src="https://unpkg.com/vue@3"></script>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        table thead {
+            border-bottom: 2px solid #ddd;
+            text-align: left;
+        }
+        table tfoot {
+            border-top: 2px solid #ddd;
+            text-align: left;
+        }
+        table th {
+            padding: 10px;
+        }
+        table td {
+            padding: 10px;
+            border-top: 1px solid #ddd;
+        }
+
+        @media only screen and (min-width: 800px) {
+            table {
+                margin: 30px;
+                width: calc(100% - 60px);
+                min-width: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <button onclick="if (confirm('Deleting all data; are you sure?')) { localStorage.removeItem('orders'); window.location.reload(); }">Clear data</button>
+        <button @click="download">Export data</button>
+        <h3>Postcards</h3>
+        Count: {{ orders.reduce((total, order) => total + order.postcards, 0) }}
+        <h3>Free Meals</h3>
+        Count: {{ orders.reduce((total, order) => total + order.freeMeal, 0) }}<br>
+        Total: {{ priceFormatter.format(orders.reduce((total, order) => total + order.freeMeal * order.total, 0)) }}
+        <h3>Orders</h3>
+        Count: {{ orders.length }}
+        <h3>Items</h3>
+        <table v-if="orders.length > 0">
+            <thead>
+            <tr>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Cost each</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tr v-for="(item, name) in orders[0].items">
+                <td>{{ name }}</td>
+                <td>{{ totalOf(name) }}</td>
+                <td>{{ item.cost }}</td>
+                <td>{{ priceFormatter.format(totalOf(name) * item.cost) }}</td>
+            </tr>
+            <tfoot>
+            <tr>
+                <th>Total</th>
+                <th></th>
+                <th></th>
+                <th>{{ priceFormatter.format(orders.reduce((total, order) => total + order.total, 0)) }}</th>
+            </tr>
+        </tfoot>
+        </table>
+        <h3>Checkout times</h3>
+        <ul>
+            <li v-for="order in orders">{{ new Date(order.time).toLocaleTimeString() }}</li>
+        </ul>
+        <details>
+            <summary>Raw data</summary>
+            <pre>
+                {{ JSON.stringify(orders, null, 4) }}
+            </pre>
+        </details>
+    </div>
+    <script>
+        const { createApp } = Vue;
+
+        const app = createApp({
+            data() {
+                return {
+                    orders: JSON.parse(localStorage.getItem("orders") || "[]"),
+                    priceFormatter: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
+                };
+            },
+            methods: {
+                totalOf(name) {
+                    return this.orders.reduce((total, order) => total + order.items[name].quantity, 0);
+                },
+                clear() {
+                    if (confirm('Deleting all data; are you sure?')) {
+                        localStorage.removeItem('orders');
+                        this.orders = []
+                    }
+                },
+                // https://stackoverflow.com/a/18197341
+                download() {
+                    var element = document.createElement('a');
+                    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(localStorage.getItem("orders")));
+                    element.setAttribute('download', "orders.json");
+
+                    element.style.display = 'none';
+                    document.body.appendChild(element);
+
+                    element.click();
+
+                    document.body.removeChild(element);
+                }
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
