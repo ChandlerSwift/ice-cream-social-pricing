@@ -62,14 +62,14 @@
 <div id="app">
     <div class="buttons" :class="{ add: addMode, sub: !addMode }">
         <button
-            v-for="item in items"
+            v-for="(item, name) in items"
             :disabled="!addMode && item.quantity == 0"
             @click="if (addMode) { item.quantity++; } else { item.quantity--; addMode=true; }"
-        >{{ item.name }}: {{ priceFormatter.format(item.cost) }}</button>
+        >{{ name }}: {{ priceFormatter.format(item.cost) }}</button>
     </div>
     <div class="summary" :class="{ add: addMode, sub: !addMode }">
         <ul>
-            <li v-for="item in items" v-show="item.quantity != 0">{{ item.name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
+            <li v-for="(item, name) in items" v-show="item.quantity != 0">{{ name }} ({{ item.quantity }}): {{ priceFormatter.format(item.cost * item.quantity) }}</li>
         </ul>
         <p v-if="postcards > 0" class="discount">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
         <p v-if="freeMeal" class="discount">&ndash;{{ priceFormatter.format(total()) }} (free meal)</p>
@@ -79,7 +79,7 @@
         <button class="removable" :disabled="addMode == freeMeal"
             @click="freeMeal = !freeMeal; addMode = true">Free Meal</button>
         <button @click="addMode=!addMode">Minus</button>
-        <button @click="items.forEach(item => item.quantity = 0); postcards = 0; freeMeal = false">Check out</button>
+        <button @click="checkout">Check out</button>
     </div>
 </div>
 
@@ -92,78 +92,64 @@
                 addMode: true,
                 postcards: 0,
                 freeMeal: false,
-                items: [
-                    {
-                        name: "Turkey Salad",
+                items: {
+                    "Turkey Salad": {
                         cost: 4,
                         quantity: 0,
                     },
-                    {
-                        name: "BBQ",
+                    "BBQ": {
                         cost: 4,
                         quantity: 0,
                     },
-                    {
-                        name: "Beans",
+                    "Beans": {
                         cost: 0.75,
                         quantity: 0,
                     },
-                    {
-                        name: "Potato Salad",
+                    "Potato Salad": {
                         cost: 2,
                         quantity: 0,
                     },
-                    {
-                        name: "Pickles",
+                    "Pickles": {
                         cost: 0,
                         quantity: 0,
                     },
-                    {
-                        name: "Cake",
+                    "Cake": {
                         cost: 1.5,
                         quantity: 0,
                     },
-                    {
-                        name: "Cake à la mode",
+                    "Cake à la mode": {
                         cost: 2.25,
                         quantity: 0,
                     },
-                    {
-                        name: "Pie",
+                    "Pie": {
                         cost: 2,
                         quantity: 0,
                     },
-                    {
-                        name: "Pie à la mode",
+                    "Pie à la mode": {
                         cost: 2.75,
                         quantity: 0,
                     },
-                    {
-                        name: "Root Beer Float",
+                    "Root Beer Float": {
                         cost: 2,
                         quantity: 0,
                     },
-                    {
-                        name: "Root Beer",
+                    "Root Beer": {
                         cost: 1,
                         quantity: 0,
                     },
-                    {
-                        name: "Milk",
+                    "Milk": {
                         cost: 1,
                         quantity: 0,
                     },
-                    {
-                        name: "Egg Coffee",
+                    "Egg Coffee": {
                         cost: 1,
                         quantity: 0,
                     },
-                    {
-                        name: "Bottled Water",
+                    "Bottled Water": {
                         cost: 1,
                         quantity: 0,
                     },
-                ],
+                },
                 priceFormatter: new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }),
             };
         },
@@ -172,7 +158,27 @@
                 return Math.min(this.total(), 7 * this.postcards);
             },
             total() {
-                return this.items.reduce((total, item) => total + item.cost * item.quantity, 0);
+                let total = 0;
+                for (const [name, item] of Object.entries(this.items)) {
+                    total += item.cost * item.quantity;
+                }
+                return total;
+            },
+            checkout() {
+                let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+                orders.push({
+                    time: Date(),
+                    items: this.items,
+                    postcards: this.postcards,
+                    freeMeal: this.freeMeal,
+                    total: this.total(),
+                });
+                localStorage.setItem("orders", JSON.stringify(orders));
+                for (const [name, item] of Object.entries(this.items)) {
+                    item.quantity = 0;
+                }
+                this.postcards = 0;
+                this.freeMeal = false;
             }
         }
     }).mount('#app');
