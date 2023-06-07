@@ -1,0 +1,28 @@
+{
+    "$schema": "https://json.schemastore.org/web-manifest-combined.json",
+    "name": "Ice Cream Social Pricing",
+    "short_name": "ICSPricing",
+    "start_url": ".",
+    "scope":"/",
+    "display": "standalone",
+    "background_color": "#212026",
+    "theme_color": "#212026",
+    "description": "Short URLS",
+    "icons": [
+      {
+        "src": "icon.png",
+        "sizes": "1024x1024",
+        "type": "image/png"
+      }
+    ],
+    "share_target": {
+        "action": ".",
+        "method": "GET",
+        "enctype": "application/x-www-form-urlencoded",
+        "params": {
+          "title": "title",
+          "text": "text",
+          "url": "url"
+        }
+      }
+  }
