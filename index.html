@@ -90,8 +90,6 @@
         <p v-if="postcards > 0" class="discount">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
         <p v-if="freeMeal" class="discount">&ndash;{{ priceFormatter.format(total()) }} (free meal)</p>
         <p id="total">Total: {{ priceFormatter.format(freeMeal ? 0 : total() - discount()) }}</p>
-        <button class="removable" :disabled="!addMode && postcards == 0"
-            @click="if (addMode) { postcards++; } else { postcards--; addMode=true; }">$7 off</button>
         <button class="removable" :disabled="addMode == freeMeal"
             @click="freeMeal = !freeMeal; addMode = true">Free Meal</button>
         <button @click="addMode=!addMode">Minus</button>
