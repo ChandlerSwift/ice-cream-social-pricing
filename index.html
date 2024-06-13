@@ -49,6 +49,9 @@
             font-size: 2em;
             color: black;
         }
+        button#stats {
+            font-size: 1em;
+        }
         button:disabled {
             color: lightgray;
         }
@@ -94,6 +97,7 @@
         <p v-if="postcards > 0" class="discount">&ndash;{{ priceFormatter.format(discount()) }} ({{ postcards }} postcards)</p>
         <p v-if="freeMeal" class="discount">&ndash;{{ priceFormatter.format(total()) }} (free meal)</p>
         <p id="total">Total: {{ priceFormatter.format(freeMeal ? 0 : total() - discount()) }}</p>
+        <button id="stats" @click="stats">Stats</button>
         <button class="removable" :disabled="addMode == freeMeal"
             @click="freeMeal = !freeMeal; addMode = true">Free Meal</button>
         <button @click="addMode=!addMode" :disabled="total() == 0 && !freeMeal">Minus</button>
@@ -198,6 +202,11 @@
                     }
                     this.postcards = 0;
                     this.freeMeal = false;
+                }
+            },
+            stats() {
+                if (confirm('Are you sure you want to stop checking out and review event statistics?')) {
+                    window.location.href = "stats.html";
                 }
             }
         }
