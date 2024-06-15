@@ -85,7 +85,7 @@
             v-for="(item, name) in items"
             :disabled="!addMode && item.quantity == 0"
             @click="if (addMode) { item.quantity++; } else { item.quantity--; addMode=true; }"
-        >{{ name }}: {{ priceFormatter.format(item.cost) }}</button>
+        >{{ name }}: {{ priceFormatter.format(item.cost) }}<span v-if="item.quantity > 0" style="color:red;"> ({{ item.quantity }})</span></button>
     </div>
     <div class="summary" :class="{ add: addMode, sub: !addMode }">
         <ul>
