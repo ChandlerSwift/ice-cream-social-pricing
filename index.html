@@ -49,7 +49,7 @@
             font-size: 2em;
             color: black;
         }
-        #app div.buttons.sub button:disabled, div.summary.sub button.removable:disabled {
+        button:disabled {
             color: lightgray;
         }
         #app div.buttons.sub button:not(:disabled), div.summary.sub button.removable:not(:disabled) {
@@ -96,7 +96,7 @@
         <p id="total">Total: {{ priceFormatter.format(freeMeal ? 0 : total() - discount()) }}</p>
         <button class="removable" :disabled="addMode == freeMeal"
             @click="freeMeal = !freeMeal; addMode = true">Free Meal</button>
-        <button @click="addMode=!addMode">Minus</button>
+        <button @click="addMode=!addMode" :disabled="total() == 0 && !freeMeal">Minus</button>
         <button @click="checkout">Next order</button>
     </div>
 </div>
