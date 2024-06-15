@@ -183,20 +183,22 @@
                 return total;
             },
             checkout() {
-                let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-                orders.push({
-                    time: Date(),
-                    items: this.items,
-                    postcards: this.postcards,
-                    freeMeal: this.freeMeal,
-                    total: this.total(),
-                });
-                localStorage.setItem("orders", JSON.stringify(orders));
-                for (const [name, item] of Object.entries(this.items)) {
-                    item.quantity = 0;
+                if (window.confirm("Checking out for " + this.priceFormatter.format(this.total()))) {
+                    let orders = JSON.parse(localStorage.getItem("orders") || "[]");
+                    orders.push({
+                        time: Date(),
+                        items: this.items,
+                        postcards: this.postcards,
+                        freeMeal: this.freeMeal,
+                        total: this.total(),
+                    });
+                    localStorage.setItem("orders", JSON.stringify(orders));
+                    for (const [name, item] of Object.entries(this.items)) {
+                        item.quantity = 0;
+                    }
+                    this.postcards = 0;
+                    this.freeMeal = false;
                 }
-                this.postcards = 0;
-                this.freeMeal = false;
             }
         }
     }).mount('#app');
