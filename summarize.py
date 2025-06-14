@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+#!/usr/bin/env nix-shell
+#! nix-shell -i python3
+#! nix-shell -p python3
 
 import json
 import os
